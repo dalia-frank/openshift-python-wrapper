@@ -5,16 +5,23 @@ the Resource class and the fake Kubernetes client.
 """
 
 import json
+from pathlib import Path
 from typing import Any
 
 import jsonschema
 from simple_logger.logger import get_logger
 
-from class_generator.constants import DEFINITIONS_FILE, RESOURCES_MAPPING_ARCHIVE, RESOURCES_MAPPING_FILE
-
 from .archive_utils import load_json_archive
 
 LOGGER = get_logger(name=__name__)
+
+# Schema files ship beside class_generator in the source tree and in the installed
+# wheel. Resolve from this module so ocp_resources does not import class_generator
+# (and so overlay checkouts still find the files even when cwd is another project).
+_SCHEMA_DIR = Path(__file__).resolve().parents[2] / "class_generator" / "schema"
+RESOURCES_MAPPING_FILE = _SCHEMA_DIR / "__resources-mappings.json"
+RESOURCES_MAPPING_ARCHIVE = _SCHEMA_DIR / "__resources-mappings.json.gz"
+DEFINITIONS_FILE = _SCHEMA_DIR / "_definitions.json"
 
 
 class SchemaValidator:
